@@ -11,6 +11,7 @@
             <th data-toggle="true">Date of birthday</th>
             <th data-toggle="true">Phone</th>
             <th data-toggle="true">E-mail</th>
+            <th data-toggle="true">Updated at</th>
             <th class="text-right" data-sort-ignore="true">Действие</th>
         </tr>
         </thead>
@@ -19,9 +20,10 @@
             <tr>
                 <td>{{ $user->first_name }}</td>
                 <td>{{ $user->last_name }}</td>
-                <td>{{ $user->date_of_birthday }}</td>
+                <td>{{ Carbon\Carbon::parse($user->date_of_birthday)->format('d.m.Y') }}</td>
                 <td>{{ $user->phone }}</td>
                 <td>{{ $user->email }}</td>
+                <td>{{ Carbon\Carbon::parse($user->updated_at)->format('d.m.Y H:i') }}</td>
                 <td class="text-right">
                     <form onsubmit="if(confirm('Delete?Will you send the best offer to Den?')){ return true }else{ return false }" action="{{route('admin.destroy', $user)}}" method="post">
                         <input type="hidden" name="_method" value="DELETE">
