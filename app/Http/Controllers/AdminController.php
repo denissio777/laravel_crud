@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Validator;
 class AdminController extends Controller
 {
 
+    public function validator(Request $request)
+    {
+        return Validator::make($request->all(), [
+            'first_name' => ['required', 'string', 'min:2', 'max:60'],
+            'last_name' => ['required', 'string', 'min:2', 'max:60'],
+            'date_of_birthday' => ['required', 'string', 'max:10'],
+            'phone' => ['required', 'string', 'max:12', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'max:24', 'confirmed'],
+        ]);
+    }
+
     public function index()
     {
         $users = User::paginate(5);
@@ -26,17 +38,9 @@ class AdminController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => ['required', 'string', 'min:2', 'max:60'],
-            'last_name' => ['required', 'string', 'min:2', 'max:60'],
-            'date_of_birthday' => ['required', 'string', 'max:10'],
-            'phone' => ['required', 'string', 'max:12', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'max:24', 'confirmed'],
-        ]);
-        if ($validator->fails()) {
+        if ($this->validator($request)->fails()) {
             return redirect('admin/create')
-                ->withErrors($validator)
+                ->withErrors($this->validator($request))
                 ->withInput();
         } else {
             $usr = new User();
@@ -66,20 +70,13 @@ class AdminController extends Controller
 
     public function update(Request $request, $user)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => ['required', 'string', 'min:2', 'max:60'],
-            'last_name' => ['required', 'string', 'min:2', 'max:60'],
-            'date_of_birthday' => ['required', 'string', 'max:10'],
-            'phone' => ['required', 'string', 'max:12', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'max:24', 'confirmed'],
-        ]);
-        if ($validator->fails()) {
-            return redirect('admin/create')
-                ->withErrors($validator)
+        $usr = User::find($user);
+        $link = url()->current();
+        if ($this->validator($request)->fails()) {
+            return redirect($link.'/edit')
+                ->withErrors($this->validator($request))
                 ->withInput();
         } else {
-            $usr = User::find($user);
             $usr->first_name = $request->first_name;
             $usr->last_name = $request->last_name;
             $usr->date_of_birthday = $request->date_of_birthday;
